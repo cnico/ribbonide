@@ -59,7 +59,7 @@ public final class DebugTabBuilder extends AbstractTabBuilder {
 		RibbonActionFactory.createStepInto(rtgFlow2, window);
 		RibbonActionFactory.createStepOver(rtgFlow2, window);
 		RibbonActionFactory.createStepReturn(rtgFlow2, window);
-		// TODO [ev] try this later -- tracking statcke of RTL is not
+		// TODO [ev] try this later -- tracking enablement of RTL is not
 		// straightforward
 		// RibbonActionFactory.createRunToLine(rtgFlow2, window);
 
@@ -87,9 +87,7 @@ public final class DebugTabBuilder extends AbstractTabBuilder {
 	private void createGroupLaunch(RibbonTab tab) {
 		RibbonGroup group = new RibbonGroup(tab, "Launch");
 
-		RibbonButton rbDebug = new RibbonButton(group, ICE
-				.getImage("debug_exc_30.png"), "Debug",
-				RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonActionFactory.createLaunchDebug(group, window);
 		RibbonButton rbRun = new RibbonButton(group, ICE
 				.getImage("run_exc_30.png"), "Run ",
 				RibbonButton.STYLE_ARROW_DOWN_SPLIT);

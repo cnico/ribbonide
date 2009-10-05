@@ -10,12 +10,14 @@
  *******************************************************************************/
 package de.volanakis.ribbonide.internal;
 
+import static com.hexapixel.widgets.ribbon.AbstractRibbonGroupItem.STYLE_ARROW_DOWN_SPLIT;
 import static com.hexapixel.widgets.ribbon.AbstractRibbonGroupItem.STYLE_PUSH;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandEvent;
 import org.eclipse.core.commands.ICommandListener;
 import org.eclipse.core.commands.common.CommandException;
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.internal.ui.commands.actions.DebugCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.DropToFrameCommandAction;
@@ -29,9 +31,12 @@ import org.eclipse.debug.internal.ui.commands.actions.TerminateCommandAction;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
@@ -49,6 +54,7 @@ import com.hexapixel.widgets.ribbon.RibbonButtonGroup;
 import com.hexapixel.widgets.ribbon.RibbonGroup;
 import com.hexapixel.widgets.ribbon.RibbonTabFolder;
 import com.hexapixel.widgets.ribbon.RibbonToolbarGrouping;
+import com.hexapixel.widgets.ribbon.RibbonTooltip;
 
 import de.volanakis.ribbonide.internal.d.ICD;
 import de.volanakis.ribbonide.internal.e.ICE;
@@ -288,8 +294,7 @@ public final class RibbonActionFactory {
 				.getImage("suspend_co.gif"), ICD.getImage("suspend_co.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window, new SuspendCommandAction())
-					.setTrace(true);
+			new DebugActionDelegate(result, window, new SuspendCommandAction());
 		}
 		return result;
 	}
@@ -347,7 +352,7 @@ public final class RibbonActionFactory {
 				.getImage("stepreturn_co.gif"), STYLE_PUSH);
 		if (window != null) {
 			new DebugActionDelegate(result, window,
-					new StepReturnCommandAction()).setTrace(true);
+					new StepReturnCommandAction());
 		}
 		return result;
 	}
@@ -385,6 +390,21 @@ public final class RibbonActionFactory {
 		}
 	}
 
+	public static RibbonButton createLaunchDebug(RibbonGroup parent,
+			IWorkbenchWindow window) {
+		final RibbonButton result = new RibbonButton(parent, ICE
+				.getImage("debug_exc_30.png"), "Debug", STYLE_ARROW_DOWN_SPLIT);
+		if (window != null) {
+			new CommandDelegate(result,
+					"org.eclipse.debug.ui.commands.DebugLast");
+			Menu buttonMenu = result.getMenu();
+			new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
+			new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
+			new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
+		}
+		return result;
+	}
+
 	// helping methods
 	// ////////////////
 
@@ -420,6 +440,7 @@ public final class RibbonActionFactory {
 			action.addPropertyChangeListener(this);
 			button.addSelectionListener(this);
 			button.setEnabled(action.isEnabled());
+			updateTooltip();
 		}
 
 		@Override
@@ -454,6 +475,21 @@ public final class RibbonActionFactory {
 		private void trace(String format, Object... args) {
 			if (trace) {
 				Activator.trace(format, args);
+			}
+		}
+
+		private void updateTooltip() {
+			String title = action.getText();
+			String descr = action.getToolTipText();
+			if (descr == null) {
+				descr = action.getToolTipText();
+			}
+			if (title != null) {
+				title = title.replace("&", "");
+				if (descr == null) {
+					descr = title;
+				}
+				button.setToolTip(new RibbonTooltip(title, descr));
 			}
 		}
 	}
@@ -500,20 +536,25 @@ public final class RibbonActionFactory {
 			boolean enabled = command.isDefined() ? command.isEnabled() : false;
 			button.setEnabled(enabled);
 			button.addSelectionListener(this);
+			updateTooltip();
 		}
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			trace("sel: %s - e:%s, h:%s", commandId, command.isEnabled(),
 					command.isHandled());
-			button.setSelected(false);
-			try {
-				getHandlerService().executeCommand(commandId, null);
-				if (button.isEnabled() != command.isEnabled()) {
-					button.setEnabled(command.isEnabled());
+			if (!button.isBottomSelected()) {
+				button.setSelected(false);
+				try {
+					getHandlerService().executeCommand(commandId, null);
+					if (button.isEnabled() != command.isEnabled()) {
+						button.setEnabled(command.isEnabled());
+					}
+				} catch (CommandException cex) {
+					Activator.log(cex);
 				}
-			} catch (CommandException cex) {
-				Activator.log(cex);
+			} else {
+				button.showMenu();
 			}
 		}
 
@@ -524,6 +565,10 @@ public final class RibbonActionFactory {
 				boolean isEnabled = commandEvent.getCommand().isEnabled();
 				trace("enabl: %s? %s", commandId, isEnabled);
 				button.setEnabled(isEnabled);
+			}
+			if (commandEvent.isNameChanged()
+					|| commandEvent.isDescriptionChanged()) {
+				updateTooltip();
 			}
 		}
 
@@ -540,6 +585,24 @@ public final class RibbonActionFactory {
 		private void trace(String format, Object... args) {
 			if (trace) {
 				Activator.trace(format, args);
+			}
+		}
+
+		private void updateTooltip() {
+			String title = null;
+			String descr = null;
+			try {
+				title = command.getName();
+				try {
+					descr = command.getDescription();
+				} catch (NotDefinedException nde) {
+					descr = title;
+				}
+			} catch (NotDefinedException e) {
+				// ignore
+			}
+			if (title != null) {
+				button.setToolTip(new RibbonTooltip(title, descr));
 			}
 		}
 	}
@@ -564,6 +627,7 @@ public final class RibbonActionFactory {
 				button.addDisposeListener(this);
 				action.addPropertyChangeListener(this);
 				button.addSelectionListener(this);
+				updateTooltip();
 			} else {
 				Activator.logWarning(new Exception("Undefined wizard: "
 						+ wizardId));
@@ -584,6 +648,19 @@ public final class RibbonActionFactory {
 		public void itemDisposed(AbstractRibbonGroupItem item) {
 			action.removePropertyChangeListener(this);
 		}
-	}
 
+		private void updateTooltip() {
+			String title = action.getText();
+			String descr = action.getToolTipText();
+			if (descr == null) {
+				descr = action.getToolTipText();
+			}
+			if (descr == null) {
+				descr = title;
+			}
+			if (title != null) {
+				button.setToolTip(new RibbonTooltip(title, descr));
+			}
+		}
+	}
 }

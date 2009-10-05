@@ -4,13 +4,14 @@
 [DONE] * Quicktoolbar: no visual feedback on push - works in demo - need to check
 [DONE] * Sync ribbon tab with active perspective -> perspective listener
 [DONE] * Edit Tab: make 'open type' big and 'find' small
+[DONE] * Jumping on menu-reveal is distracting - fix
 
 Committed:
 * Finish 1st iteration of the tabs
 * Hook buttons to the commands
 * QuickAccessToolbar: need run, debug, step (?) icons
 * QuickAccessToolbar: seperator element
-* Extend RibbonToolTip to work as a regular tooltip too - don't always need the large tt
+* Add keybinding info to tooltip
 
 Bugs:
 * QuickAccessToolbar: tooltips do not work
@@ -44,10 +45,16 @@ Ideas:
     - the status bar (mhh)
 * Bugzilla element for Ribbon? (search # or text, create new bug) 
 * Customization mechanism (ext. point and behavior)
+Dev:
   1. You should be able to define new tabs
   2. You should be able to define new groups
   3. You should be able to associate groups with tabs
      - have visible by default true/false flag 
   4. You should be able to associate perspectives with tabs
   5. You should be able to arrange groups by drag & drop
-  5. Tab settings should persist
+User:
+  6. Tab settings should persist
+  7. Reset tab
+  8. Add/remove groups from tab, via arrow pop-up menu
+* Fade-in / fade-out for tooltip? -- see tooltips in eclipse toolbars
+? Extend RibbonToolTip to work as a regular tooltip too - don't always need the large tt
