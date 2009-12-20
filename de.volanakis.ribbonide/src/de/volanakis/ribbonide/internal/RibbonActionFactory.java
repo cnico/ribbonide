@@ -31,12 +31,10 @@ import org.eclipse.debug.internal.ui.commands.actions.TerminateCommandAction;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
@@ -390,17 +388,68 @@ public final class RibbonActionFactory {
 		}
 	}
 
-	public static RibbonButton createLaunchDebug(RibbonGroup parent,
+	public static RibbonButton createDebugLast(QuickAccessShellToolbar qat,
 			IWorkbenchWindow window) {
-		final RibbonButton result = new RibbonButton(parent, ICE
-				.getImage("debug_exc_30.png"), "Debug", STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton result = new RibbonButton(qat, ICE
+				.getImage("debug_exc.gif"), ICD.getImage("debug_exc_ev.png"),
+				STYLE_PUSH);
+		if (window != null) {
+			new CommandDelegate(result,
+					"org.eclipse.debug.ui.commands.DebugLast");
+		}
+		return result;
+	}
+
+	public static RibbonButton createDebugLast(RibbonGroup parent,
+			IWorkbenchWindow window) {
+		RibbonButton result = new RibbonButton(parent, ICE
+				.getImage("debug_exc_30.png"),
+				ICD.getImage("debug_exc_30.png"), "Debug",
+				STYLE_ARROW_DOWN_SPLIT);
 		if (window != null) {
 			new CommandDelegate(result,
 					"org.eclipse.debug.ui.commands.DebugLast");
 			Menu buttonMenu = result.getMenu();
-			new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
-			new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
-			new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
+			// new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
+			// new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
+			// new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
+			// TODO [ev] resume here....
+			// DebugToolbarAction dta = new DebugToolbarAction();
+		}
+		return result;
+	}
+
+	public static RibbonButton createRunLast(QuickAccessShellToolbar qat,
+			IWorkbenchWindow window) {
+		RibbonButton result = new RibbonButton(qat,
+				ICE.getImage("run_exc.gif"), ICD.getImage("run_exc.gif"),
+				STYLE_PUSH);
+		if (window != null) {
+			new CommandDelegate(result, "org.eclipse.debug.ui.commands.RunLast");
+		}
+		return result;
+	}
+
+	public static RibbonButton createRunLast(RibbonGroup parent,
+			IWorkbenchWindow window) {
+		RibbonButton result = new RibbonButton(parent, ICE
+				.getImage("run_exc_30.png"), ICD.getImage("run_exc_30.png"),
+				"Run", STYLE_ARROW_DOWN_SPLIT);
+		if (window != null) {
+			new CommandDelegate(result, "org.eclipse.debug.ui.commands.RunLast");
+		}
+		return result;
+	}
+
+	public static RibbonButton createRunExternal(RibbonGroup parent,
+			IWorkbenchWindow window) {
+		RibbonButton result = new RibbonButton(parent, ICE
+				.getImage("external_tools_ev_30.png"), ICD
+				.getImage("external_tools_ev_30.png"), "Run",
+				STYLE_ARROW_DOWN_SPLIT);
+		if (window != null) {
+			new CommandDelegate(result,
+					"org.eclipse.ui.externaltools.ExternalToolMenuDelegateToolbar");
 		}
 		return result;
 	}
@@ -421,6 +470,9 @@ public final class RibbonActionFactory {
 	// helping classes
 	// ////////////////
 
+	/**
+	 * Connects a {@link RibbonButton} with an {@link IAction}.
+	 */
 	private static class ActionDelegate extends SelectionAdapter implements
 			IPropertyChangeListener, IDisposeListener {
 
@@ -467,6 +519,9 @@ public final class RibbonActionFactory {
 			action.removePropertyChangeListener(this);
 		}
 
+		// helping methods
+		// ////////////////
+
 		@SuppressWarnings("unused")
 		void setTrace(boolean trace) {
 			this.trace = trace;
@@ -481,9 +536,6 @@ public final class RibbonActionFactory {
 		private void updateTooltip() {
 			String title = action.getText();
 			String descr = action.getToolTipText();
-			if (descr == null) {
-				descr = action.getToolTipText();
-			}
 			if (title != null) {
 				title = title.replace("&", "");
 				if (descr == null) {
@@ -494,6 +546,9 @@ public final class RibbonActionFactory {
 		}
 	}
 
+	/**
+	 * Connects a {@link RibbonButton} with a {@link DebugCommandAction}.
+	 */
 	private static final class DebugActionDelegate extends ActionDelegate {
 
 		private final DebugCommandAction debugAction;
@@ -510,9 +565,65 @@ public final class RibbonActionFactory {
 			super.itemDisposed(item);
 			debugAction.dispose();
 		}
-
 	}
 
+	/**
+	 * Connects a {@link RibbonButton} with a
+	 * {@link IWorkbenchWindowActionDelegate}.
+	 */
+	// TODO [ev] remove
+	// private static final class WorkbenchWindowActionDelegate extends
+	// SelectionAdapter implements IDisposeListener {
+	//
+	// private final RibbonButton button;
+	// private final IAction proxyAction;
+	// private final IWorkbenchWindowActionDelegate delegate;
+	// private boolean trace;
+	//
+	// public WorkbenchWindowActionDelegate(RibbonButton button,
+	// IWorkbenchWindow window, IWorkbenchWindowActionDelegate delegate) {
+	// this.button = button;
+	// this.proxyAction = new ProxyAction(button);
+	// this.delegate = delegate;
+	//
+	// button.addDisposeListener(this);
+	// button.addSelectionListener(this);
+	// if (delegate instanceof IActionDelegate2) {
+	// ((IActionDelegate2) delegate).init(proxyAction);
+	// }
+	// delegate.init(window);
+	// delegate.selectionChanged(proxyAction, StructuredSelection.EMPTY);
+	// }
+	//
+	// @Override
+	// public void widgetSelected(SelectionEvent e) {
+	// trace("sel: %s", delegate.getClass().getName());
+	// button.setSelected(false);
+	// delegate.run(proxyAction);
+	// }
+	//
+	// public void itemDisposed(AbstractRibbonGroupItem item) {
+	// delegate.dispose();
+	// }
+	//
+	// // helping methods
+	// // ////////////////
+	//
+	// @SuppressWarnings("unused")
+	// void setTrace(boolean trace) {
+	// this.trace = trace;
+	// }
+	//
+	// private void trace(String format, Object... args) {
+	// if (trace) {
+	// Activator.trace(format, args);
+	// }
+	// }
+	// }
+
+	/**
+	 * Connects a {@link RibbonButton} with a {@link Command}.
+	 */
 	private static final class CommandDelegate extends SelectionAdapter
 			implements ICommandListener, IDisposeListener {
 
@@ -577,6 +688,9 @@ public final class RibbonActionFactory {
 			command.removeCommandListener(this);
 		}
 
+		// helping methods
+		// ////////////////
+
 		@SuppressWarnings("unused")
 		void setTrace(boolean trace) {
 			this.trace = trace;
@@ -607,6 +721,9 @@ public final class RibbonActionFactory {
 		}
 	}
 
+	/**
+	 * Connects a {@link RibbonButton} with an {@link IWizardDescriptor}.
+	 */
 	private static final class WizardDelegate extends SelectionAdapter
 			implements IPropertyChangeListener, IDisposeListener {
 
@@ -649,16 +766,16 @@ public final class RibbonActionFactory {
 			action.removePropertyChangeListener(this);
 		}
 
+		// helping methods
+		// ////////////////
+
 		private void updateTooltip() {
 			String title = action.getText();
 			String descr = action.getToolTipText();
-			if (descr == null) {
-				descr = action.getToolTipText();
-			}
-			if (descr == null) {
-				descr = title;
-			}
 			if (title != null) {
+				if (descr == null) {
+					descr = title;
+				}
 				button.setToolTip(new RibbonTooltip(title, descr));
 			}
 		}

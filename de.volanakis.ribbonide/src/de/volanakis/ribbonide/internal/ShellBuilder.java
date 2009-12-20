@@ -49,8 +49,10 @@ public final class ShellBuilder extends AbstractWindowBuilder {
 	@Override
 	protected void fillQuickAccessToolbar(final QuickAccessShellToolbar qat) {
 		RibbonActionFactory.createSave(qat, getWindow());
-		RibbonActionFactory.createUndo(qat, getWindow());
-		RibbonActionFactory.createRedo(qat, getWindow());
+		// RibbonActionFactory.createUndo(qat, getWindow());
+		// RibbonActionFactory.createRedo(qat, getWindow());
+		RibbonActionFactory.createDebugLast(qat, getWindow());
+		RibbonActionFactory.createRunLast(qat, getWindow());
 	}
 
 	@Override

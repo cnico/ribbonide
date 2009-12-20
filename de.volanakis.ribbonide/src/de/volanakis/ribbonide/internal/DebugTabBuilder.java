@@ -87,13 +87,9 @@ public final class DebugTabBuilder extends AbstractTabBuilder {
 	private void createGroupLaunch(RibbonTab tab) {
 		RibbonGroup group = new RibbonGroup(tab, "Launch");
 
-		RibbonActionFactory.createLaunchDebug(group, window);
-		RibbonButton rbRun = new RibbonButton(group, ICE
-				.getImage("run_exc_30.png"), "Run ",
-				RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonButton rbRunExt = new RibbonButton(group, ICE
-				.getImage("external_tools_ev_30.png"), "Run Ext",
-				RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonActionFactory.createDebugLast(group, window);
+		RibbonActionFactory.createRunLast(group, window);
+		RibbonActionFactory.createRunExternal(group, window);
 	}
 
 	private void createGroupNavigation(RibbonTab tab) {

@@ -12,14 +12,9 @@ package de.volanakis.ribbonide.internal;
 
 import org.eclipse.ui.IWorkbenchWindow;
 
-import com.hexapixel.widgets.ribbon.RibbonButton;
 import com.hexapixel.widgets.ribbon.RibbonButtonGroup;
 import com.hexapixel.widgets.ribbon.RibbonGroup;
 import com.hexapixel.widgets.ribbon.RibbonTab;
-import com.hexapixel.widgets.ribbon.RibbonToolbar;
-import com.hexapixel.widgets.ribbon.RibbonToolbarGrouping;
-
-import de.volanakis.ribbonide.internal.e.ICE;
 
 /**
  * Create the 'Edit' Tab, corresponding to the Java perspective.
@@ -38,7 +33,6 @@ public final class EditTabBuilder extends AbstractTabBuilder {
 		createGroupLaunch(tab);
 		createGroupOpen(tab);
 		createGroupCreate(tab);
-		createGroupNavigation(tab);
 		// createGroupEditorTweaks(result);
 	}
 
@@ -62,15 +56,9 @@ public final class EditTabBuilder extends AbstractTabBuilder {
 	private void createGroupLaunch(RibbonTab tab) {
 		RibbonGroup group = new RibbonGroup(tab, "Launch");
 
-		RibbonButton rbDebug = new RibbonButton(group, ICE
-				.getImage("debug_exc_30.png"), "Debug",
-				RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonButton rbRun = new RibbonButton(group, ICE
-				.getImage("run_exc_30.png"), "Run ",
-				RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonButton rbRunExt = new RibbonButton(group, ICE
-				.getImage("external_tools_ev_30.png"), "Run Ext",
-				RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonActionFactory.createDebugLast(group, window);
+		RibbonActionFactory.createRunLast(group, window);
+		RibbonActionFactory.createRunExternal(group, window);
 	}
 
 	private void createGroupOpen(RibbonTab tab) {
@@ -111,22 +99,5 @@ public final class EditTabBuilder extends AbstractTabBuilder {
 	// RibbonButton rbPinEditor = new RibbonButton(sub3, ICE
 	// .getImage("pin_editor.gif"), null, RibbonButton.STYLE_TOGGLE);
 	// }
-
-	private void createGroupNavigation(RibbonTab tab) {
-		RibbonGroup group = new RibbonGroup(tab, "Navigate");
-
-		RibbonToolbar toolbar = new RibbonToolbar(group,
-				RibbonToolbar.STYLE_BORDERED, 2);
-
-		RibbonToolbarGrouping rtgNavigate = new RibbonToolbarGrouping(toolbar,
-				1);
-		RibbonActionFactory.createGoLastEdit(rtgNavigate, window);
-		RibbonActionFactory.createGoBackward(rtgNavigate, window);
-		RibbonActionFactory.createGoForward(rtgNavigate, window);
-
-		RibbonToolbarGrouping rtgAnnot = new RibbonToolbarGrouping(toolbar, 2);
-		RibbonActionFactory.createGoNext(rtgAnnot, window);
-		RibbonActionFactory.createGoPrevious(rtgAnnot, window);
-	}
 
 }
