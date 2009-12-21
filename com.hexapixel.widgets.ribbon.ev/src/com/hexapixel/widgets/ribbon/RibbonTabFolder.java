@@ -10,7 +10,8 @@
  *    eclipse-dev@volanakis.de - fix: don't dispose shell when close is aborted,
  *                               fix: notify help button on click, fix: compute  
  *                               correct help icon position when other things  
- *                               are above folder
+ *                               are above folder, fix: stuck hover after closing 
+ *                               big button menu
  *******************************************************************************/ 
 
 package com.hexapixel.widgets.ribbon;
@@ -23,6 +24,8 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -118,6 +121,14 @@ public class RibbonTabFolder extends Composite implements MouseListener, MouseMo
 		
 		if (isShell())
 			updateMenuBarButtonCalculations();
+		
+		mRibbonShell.getBigButtonMenu().addMenuListener(new MenuAdapter() {
+			public void menuHidden(MenuEvent e) {
+				Point cursor = e.display.getCursorLocation();
+				Point xy = e.display.map(null, RibbonTabFolder.this, cursor);
+				updateButtonStates(xy.x, xy.y);
+			}	
+		});
 		
 		addKeyListener(new KeyListener() {
 

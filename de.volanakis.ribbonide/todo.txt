@@ -5,11 +5,12 @@
 [DONE] * Sync ribbon tab with active perspective -> perspective listener
 [DONE] * Edit Tab: make 'open type' big and 'find' small
 [DONE] * Jumping on menu-reveal is distracting - fix
+[DONE] * QuickAccessToolbar: need run, debug icons
+[DONE] * BigButton stuck hover after closing menu - fix
 
 Committed:
 * Finish 1st iteration of the tabs
 * Hook buttons to the commands
-* QuickAccessToolbar: need run, debug icons
 * QuickAccessToolbar: separator element
 * Add keybinding info to tooltip
 * 'Eclipse' Window and System icons (task switcher, task bar)
@@ -18,8 +19,6 @@ Committed:
 Bugs:
 * QuickAccessToolbar: tooltips do not work
 * QuickAccessToolbar: push mouse button down, move mouse -> will drag window
-* BigButton stuck hover: click BB, click on view, hover still there, move cursor 
-  to Ribbon, hover updated -> try a close listener on the BB-menu, reset/repaint hover on close 
 * It seems that the image/text on large toolbar buttons is not always aligned -> check
 * Arrow on large split buttons is not always centered: check 'Run' button
 * Pause exec, Drop To Frame enabled after exec finished
