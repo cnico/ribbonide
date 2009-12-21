@@ -264,7 +264,9 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 	
 	void redraw() {
 		RibbonTabFolder tabFolder = mRibbonShell.getRibbonTabFolder();
-		tabFolder.redraw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, false);
+		if (!tabFolder.isDisposed()) {
+			tabFolder.redraw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, false);
+		}
 	}
 
 }
