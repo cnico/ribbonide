@@ -149,7 +149,9 @@ public abstract class AbstractRibbonGroupItem implements MenuListener, IDisposab
 	}
 	
 	public void menuHidden(MenuEvent e) {
-		setBottomSelected(false);
+		setSelected(false);
+		setHoverButton(false);
+		redraw();
 	}
 
 	public void menuShown(MenuEvent e) {

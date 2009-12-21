@@ -99,7 +99,8 @@ public final class RibbonActionFactory {
 	public static RibbonButton createOpenType(RibbonGroup parent,
 			IWorkbenchWindow window) {
 		RibbonButton result = new RibbonButton(parent, ICE
-				.getImage("opentype_30.png"), null, "Type", STYLE_PUSH);
+				.getImage("opentype_30.png"), ICD.getImage("opentype_30.png"),
+				"Type", STYLE_PUSH);
 		if (window != null) {
 			new CommandButton(result, "org.eclipse.jdt.ui.navigate.open.type");
 		}
@@ -131,7 +132,8 @@ public final class RibbonActionFactory {
 	public static RibbonButton createSearch(RibbonButtonGroup parent,
 			IWorkbenchWindow window) {
 		RibbonButton result = new RibbonButton(parent, ICE
-				.getImage("search.gif"), "Search", STYLE_PUSH);
+				.getImage("search.gif"), ICD.getImage("search.gif"), "Search",
+				STYLE_PUSH);
 		if (window != null) {
 			new CommandButton(result, "org.eclipse.search.ui.openSearchDialog");
 		}
@@ -365,7 +367,7 @@ public final class RibbonActionFactory {
 			IWorkbenchWindow window) {
 		RibbonButton result = new RibbonButton(parent, ICE
 				.getImage("drop_to_frame.gif"), ICD
-				.getImage("drop_to_frame.gif"), STYLE_PUSH);
+				.getImage("drop_to_frame_ev.png"), STYLE_PUSH);
 		if (window != null) {
 			new DebugCommandActionButton(result, window,
 					new DropToFrameCommandAction());
