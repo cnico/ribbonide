@@ -13,12 +13,9 @@ package de.volanakis.ribbonide.internal;
 import static com.hexapixel.widgets.ribbon.AbstractRibbonGroupItem.STYLE_ARROW_DOWN_SPLIT;
 import static com.hexapixel.widgets.ribbon.AbstractRibbonGroupItem.STYLE_PUSH;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.CommandEvent;
-import org.eclipse.core.commands.ICommandListener;
-import org.eclipse.core.commands.common.CommandException;
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.internal.ui.actions.DebugToolbarAction;
+import org.eclipse.debug.internal.ui.actions.RunToolbarAction;
 import org.eclipse.debug.internal.ui.commands.actions.DebugCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.DropToFrameCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.ResumeCommandAction;
@@ -38,8 +35,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.externaltools.internal.menu.ExternalToolMenuDelegate;
 import org.eclipse.ui.internal.actions.NewWizardShortcutAction;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.IWizardRegistry;
@@ -61,7 +57,7 @@ public final class RibbonActionFactory {
 
 	/*
 	 * Later: see org.eclipse.ui.internal.ide.actions.LTKLauncher for an example
-	 * how to do this with commands and handlers.
+	 * how to execute the handler for a generic command.
 	 */
 
 	public static RibbonButton createSave(QuickAccessShellToolbar qat,
@@ -71,8 +67,7 @@ public final class RibbonActionFactory {
 				STYLE_PUSH);
 		result.setEnabled(false);
 		if (window != null) {
-			new ActionDelegate(result, window, ActionFactory.SAVE
-					.create(window));
+			new ActionButton(result, window, ActionFactory.SAVE.create(window));
 		}
 		return result;
 	}
@@ -84,8 +79,7 @@ public final class RibbonActionFactory {
 				STYLE_PUSH);
 		result.setEnabled(false);
 		if (window != null) {
-			new ActionDelegate(result, window, ActionFactory.UNDO
-					.create(window));
+			new ActionButton(result, window, ActionFactory.UNDO.create(window));
 		}
 		return result;
 	}
@@ -97,8 +91,7 @@ public final class RibbonActionFactory {
 				STYLE_PUSH);
 		result.setEnabled(false);
 		if (window != null) {
-			new ActionDelegate(result, window, ActionFactory.REDO
-					.create(window));
+			new ActionButton(result, window, ActionFactory.REDO.create(window));
 		}
 		return result;
 	}
@@ -108,7 +101,7 @@ public final class RibbonActionFactory {
 		RibbonButton result = new RibbonButton(parent, ICE
 				.getImage("opentype_30.png"), null, "Type", STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.jdt.ui.navigate.open.type");
+			new CommandButton(result, "org.eclipse.jdt.ui.navigate.open.type");
 		}
 		return result;
 	}
@@ -119,7 +112,7 @@ public final class RibbonActionFactory {
 				.getImage("open_artifact_obj.gif"), ICD
 				.getImage("open_artifact_obj.gif"), "Plugin", STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.pde.ui.openPluginArtifact");
+			new CommandButton(result, "org.eclipse.pde.ui.openPluginArtifact");
 		}
 		return result;
 	}
@@ -130,7 +123,7 @@ public final class RibbonActionFactory {
 				.getImage("open_file_ev.png"),
 				ICD.getImage("open_file_ev.png"), "File", STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.ui.navigate.openResource");
+			new CommandButton(result, "org.eclipse.ui.navigate.openResource");
 		}
 		return result;
 	}
@@ -140,8 +133,7 @@ public final class RibbonActionFactory {
 		RibbonButton result = new RibbonButton(parent, ICE
 				.getImage("search.gif"), "Search", STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result,
-					"org.eclipse.search.ui.openSearchDialog");
+			new CommandButton(result, "org.eclipse.search.ui.openSearchDialog");
 		}
 		return result;
 	}
@@ -152,7 +144,7 @@ public final class RibbonActionFactory {
 				.getImage("last_edit_pos.gif"), ICD
 				.getImage("last_edit_pos.gif"), STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result,
+			new CommandButton(result,
 					"org.eclipse.ui.edit.text.gotoLastEditPosition");
 		}
 		return result;
@@ -164,8 +156,7 @@ public final class RibbonActionFactory {
 				.getImage("backward_nav.gif"),
 				ICD.getImage("backward_nav.gif"), STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result,
-					"org.eclipse.ui.navigate.backwardHistory");
+			new CommandButton(result, "org.eclipse.ui.navigate.backwardHistory");
 		}
 		return result;
 	}
@@ -176,8 +167,7 @@ public final class RibbonActionFactory {
 				.getImage("forward_nav.gif"), ICD.getImage("forward_nav.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result,
-					"org.eclipse.ui.navigate.forwardHistory");
+			new CommandButton(result, "org.eclipse.ui.navigate.forwardHistory");
 		}
 		return result;
 	}
@@ -188,7 +178,7 @@ public final class RibbonActionFactory {
 				.getImage("next_nav.gif"), ICD.getImage("next_nav.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.ui.navigate.next");
+			new CommandButton(result, "org.eclipse.ui.navigate.next");
 		}
 		return result;
 	}
@@ -199,7 +189,7 @@ public final class RibbonActionFactory {
 				.getImage("prev_nav.gif"), ICD.getImage("prev_nav.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.ui.navigate.previous");
+			new CommandButton(result, "org.eclipse.ui.navigate.previous");
 		}
 		return result;
 	}
@@ -210,7 +200,7 @@ public final class RibbonActionFactory {
 				.getImage("new_wiz.gif"), ICD.getImage("new_wiz.gif"),
 				"New...", STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.ui.newWizard");
+			new CommandButton(result, "org.eclipse.ui.newWizard");
 		}
 		return result;
 	}
@@ -221,7 +211,7 @@ public final class RibbonActionFactory {
 				.getImage("newjprj_wiz.gif"), ICD.getImage("newjprj_wiz.gif"),
 				"Project", STYLE_PUSH);
 		if (window != null) {
-			new WizardDelegate(result, window,
+			new WizardButton(result, window,
 					"org.eclipse.jdt.ui.wizards.JavaProjectWizard");
 		}
 		return result;
@@ -233,7 +223,7 @@ public final class RibbonActionFactory {
 				.getImage("newpprj_wiz.gif"), ICD.getImage("newpprj_wiz.gif"),
 				"Plugin", STYLE_PUSH);
 		if (window != null) {
-			new WizardDelegate(result, window,
+			new WizardButton(result, window,
 					"org.eclipse.pde.ui.NewProjectWizard");
 		}
 		return result;
@@ -245,7 +235,7 @@ public final class RibbonActionFactory {
 				.getImage("newpack_wiz.gif"), ICD.getImage("newpack_wiz.gif"),
 				"Package", STYLE_PUSH);
 		if (window != null) {
-			new WizardDelegate(result, window,
+			new WizardButton(result, window,
 					"org.eclipse.jdt.ui.wizards.NewPackageCreationWizard");
 		}
 		return result;
@@ -257,7 +247,7 @@ public final class RibbonActionFactory {
 				.getImage("newclass_wiz.gif"),
 				ICD.getImage("newclass_wiz.gif"), "Class", STYLE_PUSH);
 		if (window != null) {
-			new WizardDelegate(result, window,
+			new WizardButton(result, window,
 					"org.eclipse.jdt.ui.wizards.NewClassCreationWizard");
 		}
 		return result;
@@ -269,7 +259,7 @@ public final class RibbonActionFactory {
 				.getImage("newint_wiz.gif"), ICD.getImage("newint_wiz.gif"),
 				"Interface", STYLE_PUSH);
 		if (window != null) {
-			new WizardDelegate(result, window,
+			new WizardButton(result, window,
 					"org.eclipse.jdt.ui.wizards.NewInterfaceCreationWizard");
 		}
 		return result;
@@ -281,7 +271,8 @@ public final class RibbonActionFactory {
 				.getImage("resume_co.gif"), ICD.getImage("resume_co.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window, new ResumeCommandAction());
+			new DebugCommandActionButton(result, window,
+					new ResumeCommandAction());
 		}
 		return result;
 	}
@@ -292,7 +283,8 @@ public final class RibbonActionFactory {
 				.getImage("suspend_co.gif"), ICD.getImage("suspend_co.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window, new SuspendCommandAction());
+			new DebugCommandActionButton(result, window,
+					new SuspendCommandAction());
 		}
 		return result;
 	}
@@ -303,7 +295,7 @@ public final class RibbonActionFactory {
 				.getImage("terminate_co.gif"),
 				ICD.getImage("terminate_co.gif"), STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window,
+			new DebugCommandActionButton(result, window,
 					new TerminateCommandAction());
 		}
 		return result;
@@ -315,7 +307,7 @@ public final class RibbonActionFactory {
 				.getImage("term_restart_ev.gif"), ICD
 				.getImage("term_restart_ev.gif"), STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window,
+			new DebugCommandActionButton(result, window,
 					new TerminateAndRelaunchAction());
 		}
 		return result;
@@ -327,7 +319,8 @@ public final class RibbonActionFactory {
 				.getImage("stepinto_co.gif"), ICD.getImage("stepinto_co.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window, new StepIntoCommandAction());
+			new DebugCommandActionButton(result, window,
+					new StepIntoCommandAction());
 		}
 		return result;
 	}
@@ -338,7 +331,8 @@ public final class RibbonActionFactory {
 				.getImage("stepover_co.gif"), ICD.getImage("stepover_co.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window, new StepOverCommandAction());
+			new DebugCommandActionButton(result, window,
+					new StepOverCommandAction());
 		}
 		return result;
 	}
@@ -349,7 +343,7 @@ public final class RibbonActionFactory {
 				.getImage("stepreturn_co.gif"), ICD
 				.getImage("stepreturn_co.gif"), STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window,
+			new DebugCommandActionButton(result, window,
 					new StepReturnCommandAction());
 		}
 		return result;
@@ -373,7 +367,7 @@ public final class RibbonActionFactory {
 				.getImage("drop_to_frame.gif"), ICD
 				.getImage("drop_to_frame.gif"), STYLE_PUSH);
 		if (window != null) {
-			new DebugActionDelegate(result, window,
+			new DebugCommandActionButton(result, window,
 					new DropToFrameCommandAction());
 		}
 		return result;
@@ -383,7 +377,7 @@ public final class RibbonActionFactory {
 			IWorkbenchWindow window) {
 		rtf.setHelpImage(ICE.getImage("help_contents.gif"));
 		if (window != null) {
-			new CommandDelegate(rtf.getHelpButton(),
+			new CommandButton(rtf.getHelpButton(),
 					"org.eclipse.ui.help.helpContents");
 		}
 	}
@@ -394,8 +388,7 @@ public final class RibbonActionFactory {
 				.getImage("debug_exc.gif"), ICD.getImage("debug_exc_ev.png"),
 				STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result,
-					"org.eclipse.debug.ui.commands.DebugLast");
+			new CommandButton(result, "org.eclipse.debug.ui.commands.DebugLast");
 		}
 		return result;
 	}
@@ -407,14 +400,10 @@ public final class RibbonActionFactory {
 				ICD.getImage("debug_exc_30.png"), "Debug",
 				STYLE_ARROW_DOWN_SPLIT);
 		if (window != null) {
-			new CommandDelegate(result,
+			CommandButton cmd = new CommandButton(result,
 					"org.eclipse.debug.ui.commands.DebugLast");
-			Menu buttonMenu = result.getMenu();
-			// new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
-			// new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
-			// new MenuItem(buttonMenu, SWT.NONE).setText("Hello World");
-			// TODO [ev] resume here....
-			// DebugToolbarAction dta = new DebugToolbarAction();
+			cmd.setRemoveAllWhenShown(true);
+			cmd.addMenuListener(new DebugHistoryAction());
 		}
 		return result;
 	}
@@ -425,7 +414,7 @@ public final class RibbonActionFactory {
 				ICE.getImage("run_exc.gif"), ICD.getImage("run_exc.gif"),
 				STYLE_PUSH);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.debug.ui.commands.RunLast");
+			new CommandButton(result, "org.eclipse.debug.ui.commands.RunLast");
 		}
 		return result;
 	}
@@ -436,7 +425,10 @@ public final class RibbonActionFactory {
 				.getImage("run_exc_30.png"), ICD.getImage("run_exc_30.png"),
 				"Run", STYLE_ARROW_DOWN_SPLIT);
 		if (window != null) {
-			new CommandDelegate(result, "org.eclipse.debug.ui.commands.RunLast");
+			CommandButton cmd = new CommandButton(result,
+					"org.eclipse.debug.ui.commands.RunLast");
+			cmd.setRemoveAllWhenShown(true);
+			cmd.addMenuListener(new RunHistoryAction());
 		}
 		return result;
 	}
@@ -448,23 +440,12 @@ public final class RibbonActionFactory {
 				.getImage("external_tools_ev_30.png"), "Run",
 				STYLE_ARROW_DOWN_SPLIT);
 		if (window != null) {
-			new CommandDelegate(result,
+			CommandButton cmd = new CommandButton(result,
 					"org.eclipse.ui.externaltools.ExternalToolMenuDelegateToolbar");
+			cmd.setRemoveAllWhenShown(true);
+			cmd.addMenuListener(new ExternalHistoryAction());
 		}
 		return result;
-	}
-
-	// helping methods
-	// ////////////////
-
-	private static ICommandService getCommandService() {
-		return (ICommandService) PlatformUI.getWorkbench().getService(
-				ICommandService.class);
-	}
-
-	private static IHandlerService getHandlerService() {
-		return (IHandlerService) PlatformUI.getWorkbench().getService(
-				IHandlerService.class);
 	}
 
 	// helping classes
@@ -473,7 +454,7 @@ public final class RibbonActionFactory {
 	/**
 	 * Connects a {@link RibbonButton} with an {@link IAction}.
 	 */
-	private static class ActionDelegate extends SelectionAdapter implements
+	private static class ActionButton extends SelectionAdapter implements
 			IPropertyChangeListener, IDisposeListener {
 
 		private final RibbonButton button;
@@ -481,8 +462,8 @@ public final class RibbonActionFactory {
 		private final IAction action;
 		private boolean trace;
 
-		public ActionDelegate(final RibbonButton button,
-				IWorkbenchWindow window, IAction action) {
+		public ActionButton(final RibbonButton button, IWorkbenchWindow window,
+				IAction action) {
 			this.button = button;
 			this.display = window.getShell().getDisplay();
 			Assert.isNotNull(display);
@@ -549,11 +530,11 @@ public final class RibbonActionFactory {
 	/**
 	 * Connects a {@link RibbonButton} with a {@link DebugCommandAction}.
 	 */
-	private static final class DebugActionDelegate extends ActionDelegate {
+	private static final class DebugCommandActionButton extends ActionButton {
 
 		private final DebugCommandAction debugAction;
 
-		public DebugActionDelegate(RibbonButton button,
+		public DebugCommandActionButton(RibbonButton button,
 				IWorkbenchWindow window, DebugCommandAction action) {
 			super(button, window, action);
 			action.init(window);
@@ -564,6 +545,27 @@ public final class RibbonActionFactory {
 		public void itemDisposed(AbstractRibbonGroupItem item) {
 			super.itemDisposed(item);
 			debugAction.dispose();
+		}
+	}
+
+	private static final class DebugHistoryAction extends DebugToolbarAction
+			implements IMenuListener {
+		public void menuAboutToShow(Menu menu) {
+			fillMenu(menu);
+		}
+	}
+
+	private static final class RunHistoryAction extends RunToolbarAction
+			implements IMenuListener {
+		public void menuAboutToShow(Menu menu) {
+			fillMenu(menu);
+		}
+	}
+
+	private static final class ExternalHistoryAction extends
+			ExternalToolMenuDelegate implements IMenuListener {
+		public void menuAboutToShow(Menu menu) {
+			fillMenu(menu);
 		}
 	}
 
@@ -622,115 +624,15 @@ public final class RibbonActionFactory {
 	// }
 
 	/**
-	 * Connects a {@link RibbonButton} with a {@link Command}.
-	 */
-	private static final class CommandDelegate extends SelectionAdapter
-			implements ICommandListener, IDisposeListener {
-
-		private final RibbonButton button;
-		private final String commandId;
-		private final Command command;
-		private boolean trace;
-
-		public CommandDelegate(RibbonButton button, String commandId) {
-			this.button = button;
-			Assert.isNotNull(commandId);
-			this.commandId = commandId;
-
-			command = getCommandService().getCommand(commandId);
-			if (!command.isDefined()) {
-				Activator.logWarning(new Exception("Undefined command: "
-						+ commandId));
-			}
-			button.addDisposeListener(this);
-			command.addCommandListener(this);
-			boolean enabled = command.isDefined() ? command.isEnabled() : false;
-			button.setEnabled(enabled);
-			button.addSelectionListener(this);
-			updateTooltip();
-		}
-
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			trace("sel: %s - e:%s, h:%s", commandId, command.isEnabled(),
-					command.isHandled());
-			if (!button.isBottomSelected()) {
-				button.setSelected(false);
-				try {
-					getHandlerService().executeCommand(commandId, null);
-					if (button.isEnabled() != command.isEnabled()) {
-						button.setEnabled(command.isEnabled());
-					}
-				} catch (CommandException cex) {
-					Activator.log(cex);
-				}
-			} else {
-				button.showMenu();
-			}
-		}
-
-		public void commandChanged(CommandEvent commandEvent) {
-			trace("CC: %s - d:%s, e:%s, h:%s", commandId, command.isDefined(),
-					command.isEnabled(), command.isHandled());
-			if (commandEvent.isEnabledChanged()) {
-				boolean isEnabled = commandEvent.getCommand().isEnabled();
-				trace("enabl: %s? %s", commandId, isEnabled);
-				button.setEnabled(isEnabled);
-			}
-			if (commandEvent.isNameChanged()
-					|| commandEvent.isDescriptionChanged()) {
-				updateTooltip();
-			}
-		}
-
-		public void itemDisposed(AbstractRibbonGroupItem item) {
-			button.removeSelectionListener(this);
-			command.removeCommandListener(this);
-		}
-
-		// helping methods
-		// ////////////////
-
-		@SuppressWarnings("unused")
-		void setTrace(boolean trace) {
-			this.trace = trace;
-		}
-
-		private void trace(String format, Object... args) {
-			if (trace) {
-				Activator.trace(format, args);
-			}
-		}
-
-		private void updateTooltip() {
-			String title = null;
-			String descr = null;
-			try {
-				title = command.getName();
-				try {
-					descr = command.getDescription();
-				} catch (NotDefinedException nde) {
-					descr = title;
-				}
-			} catch (NotDefinedException e) {
-				// ignore
-			}
-			if (title != null) {
-				button.setToolTip(new RibbonTooltip(title, descr));
-			}
-		}
-	}
-
-	/**
 	 * Connects a {@link RibbonButton} with an {@link IWizardDescriptor}.
 	 */
-	private static final class WizardDelegate extends SelectionAdapter
-			implements IPropertyChangeListener, IDisposeListener {
+	private static final class WizardButton extends SelectionAdapter implements
+			IPropertyChangeListener, IDisposeListener {
 
 		private RibbonButton button;
 		private IAction action;
 
-		public WizardDelegate(RibbonButton button, IWorkbenchWindow window,
+		public WizardButton(RibbonButton button, IWorkbenchWindow window,
 				String wizardId) {
 			this.button = button;
 
