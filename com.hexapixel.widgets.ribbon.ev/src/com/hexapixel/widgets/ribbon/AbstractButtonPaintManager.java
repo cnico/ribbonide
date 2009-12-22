@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) Emil Crumhorn - Hexapixel.com - emil.crumhorn@gmail.com
+ * Copyright (c) Emil Crumhorn and others - Hexapixel.com - emil.crumhorn@gmail.com
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    emil.crumhorn@gmail.com - initial API and implementation
+ *    emil.crumhorn@gmail.com  - initial API and implementation
+ *    eclipse-dev@volanakis.de - separator for QuickAccessShellToolbar
  *******************************************************************************/ 
 
 package com.hexapixel.widgets.ribbon;
@@ -339,6 +340,10 @@ public class AbstractButtonPaintManager {
 	private Color mSeparatorColor = ColorCache.getInstance().getColor(251, 252, 254);
 	private Color mSeparatorColorShadow = ColorCache.getInstance().getColor(150, 180, 218);
 
+	// QUICK ACCESS SHELL TOOLBAR SEPARATOR 
+	private Color mQastSeparatorColor = ColorCache.getInstance().getColor(150, 180, 218);
+	private Color mQastSeparatorColorShadow = ColorCache.getInstance().getColor(230, 238, 249);
+
 	// SPLIT SPECIALS
 	private Color mSplitBottomSelectedTopLineLeft_Hover = ColorCache.getInstance().getColor(255, 240, 191);
 	private Color mSplitBottomSelectedTopLineMid_Hover = ColorCache.getInstance().getColor(255, 244, 215);
@@ -559,6 +564,17 @@ public class AbstractButtonPaintManager {
 		int ySpacer = (buttonBounds.height / 2) - (imBounds.height / 2);
 		
 		gc.drawImage(toUse, buttonBounds.x + xSpacer, buttonBounds.y + ySpacer);
+	}
+	
+	void drawMenuSeparator(GC gc, RibbonGroupSeparator separator) {
+		Rectangle bounds = separator.getBounds();
+		int x = bounds.x;
+		int y1 = bounds.y;
+		int y2 = bounds.y + bounds.height; 
+		gc.setForeground(mQastSeparatorColor);
+		gc.drawLine(x, y1, x, y2);
+		gc.setForeground(mQastSeparatorColorShadow);
+		gc.drawLine(x+1, y1, x+1, y2);
 	}
 	
 	private void drawBorderedToolbar(GC gc, RibbonToolbar tb) {

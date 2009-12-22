@@ -7,8 +7,8 @@
  *
  * Contributors:
  *    emil.crumhorn@gmail.com  - initial API and implementation
- *    eclipse-dev@volanakis.de - push button support for QuickAccessToolbar,
- *                               auto-redraw on enablement change
+ *    eclipse-dev@volanakis.de - push button support for QuickAccessShellToolbar,
+ *       auto-redraw on enablement change, separator for QuickAccessShellToolbar 
  *******************************************************************************/ 
 
 package com.hexapixel.widgets.ribbon;
@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Rectangle;
 public class QuickAccessShellToolbar extends RibbonToolbar {
 
 	private RibbonShell mRibbonShell;
+	private List<AbstractRibbonGroupItem> mItems;
 	private List<RibbonButton> mButtons;
 	private List<RibbonButton> mSelectedButtons;
 	private Rectangle mBounds;
@@ -31,7 +32,7 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 	public QuickAccessShellToolbar(RibbonShell parent) {
 		super(parent);
 		mRibbonShell = parent;
-		mButtons = new ArrayList<RibbonButton>();
+		mItems = new ArrayList<AbstractRibbonGroupItem>();
 		mSelectedButtons = new ArrayList<RibbonButton>();
 	}
 	
@@ -39,21 +40,26 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 		return mRibbonShell;
 	}
 	
-	public List<RibbonButton> getButtons() {
-		return mButtons;
+	public List<AbstractRibbonGroupItem> getItems() {
+		return mItems;
 	}
 	
 	void addButton(RibbonButton button) {
-		if (!mButtons.contains(button)) {
-			mButtons.add(button);
-			updateBounds();
-		}		
+		addItem(button);
+		mButtons = null;
 	}
 	
+	void addSeparator(RibbonGroupSeparator separator) {
+		addItem(separator);
+	}
+
 	public void removeButton(RibbonButton button) {
-		mButtons.remove(button);
-		mRibbonShell.redrawContents();
-		updateBounds();
+		removeItem(button);
+		mButtons = null;
+	}
+
+	void removeSeparator(RibbonGroupSeparator separator) {
+		removeItem(separator);
 	}
 	
 	public void setArrowTooltip(RibbonTooltip tooltip) {
@@ -65,7 +71,7 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 	}
 	
 	void updateBounds() {
-		if (mButtons.size() == 0)
+		if (mItems.size() == 0)
 			return;
 		
 		int x = 0;
@@ -73,9 +79,8 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 		int width = 0;
 		int height = 0;
 		
-		for (int i = 0; i < mButtons.size(); i++) {
-			RibbonButton button = mButtons.get(i);
-			Rectangle bounds = button.getBounds();			
+		for (AbstractRibbonGroupItem item : mItems) {
+			Rectangle bounds = item.getBounds();			
 			if (bounds == null)
 				continue;			
 			
@@ -111,8 +116,7 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 		boolean redraw = false;
 		boolean any = false;
 		
-		for (int i = 0; i < mButtons.size(); i++) {
-			RibbonButton button = mButtons.get(i);
+		for (RibbonButton button : getButtons()) {
 			if (!button.isEnabled())
 				continue;
 			
@@ -186,8 +190,7 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 	boolean mouseDown(MouseEvent me) {
 		boolean redraw = false;
 		
-		for (int i = 0; i < mButtons.size(); i++) {
-			RibbonButton button = mButtons.get(i);
+		for (RibbonButton button : getButtons()) {
 			if (!button.isEnabled())
 				continue;
 			
@@ -228,8 +231,7 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 	boolean mouseUp(MouseEvent me) {
 		boolean redraw = false;
 		
-		for (int i = 0; i < mButtons.size(); i++) {
-			RibbonButton button = mButtons.get(i);
+		for (RibbonButton button : getButtons()) {
 			if (!button.isEnabled())
 				continue;
 			
@@ -254,19 +256,44 @@ public class QuickAccessShellToolbar extends RibbonToolbar {
 		return redraw;
 	}
 	
+	void redraw() {
+		RibbonTabFolder tabFolder = mRibbonShell.getRibbonTabFolder();
+		if (!tabFolder.isDisposed()) {
+			tabFolder.redraw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, false);
+		}
+	}
+
+	private void addItem(AbstractRibbonGroupItem item) {
+		if (!mItems.contains(item)) {
+			mItems.add(item);
+			updateBounds();
+		}
+	}
+	
+	private List<RibbonButton> getButtons() {
+		if (mButtons == null) {
+			mButtons = new ArrayList<RibbonButton>();
+			for(AbstractRibbonGroupItem item : mItems) {
+				if (item instanceof RibbonButton) {
+					mButtons.add((RibbonButton) item);
+				}
+			}
+		}
+		return mButtons;
+	}
+
+	private void removeItem(AbstractRibbonGroupItem item) {
+		mItems.remove(item);
+		mRibbonShell.redrawContents();
+		updateBounds();
+	}
+
 	private boolean isInside(int x, int y, Rectangle rect) {
 		if (rect == null) {
 			return false;
 		}
 
 		return x >= rect.x && y >= rect.y && x <= (rect.x + rect.width-1) && y <= (rect.y + rect.height-1);
-	}
-	
-	void redraw() {
-		RibbonTabFolder tabFolder = mRibbonShell.getRibbonTabFolder();
-		if (!tabFolder.isDisposed()) {
-			tabFolder.redraw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, false);
-		}
 	}
 
 }

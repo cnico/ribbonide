@@ -7,14 +7,15 @@
 [DONE] * Jumping on menu-reveal is distracting - fix
 [DONE] * QuickAccessToolbar: need run, debug icons
 [DONE] * BigButton stuck hover after closing menu - fix
+[DONE] * QuickAccessToolbar: separator element
 
 Committed:
 * Finish 1st iteration of the tabs
 * Hook buttons to the commands
-* QuickAccessToolbar: separator element
 * Add keybinding info to tooltip
 * 'Eclipse' Window and System icons (task switcher, task bar)
 * Ribbon: button should fire on mouse up, _not_ on mouse down
+* Custom Presentation: local toolbar hidden by default -> removes clutter, better vspace usage  
 
 Bugs:
 * QuickAccessToolbar: tooltips do not work
@@ -32,7 +33,6 @@ Ideas:
 * Feedback / Donation reminder
    - write timestamp to instance location
    - 1st iteration: dialog, 2nd: use notification area
-* Custom Presentation: local toolbar hidden by default -> removes clutter, better vspace usage  
 * Shell: cheese/flicker on resize - should use an SWT Tracker
 * Replace gray menus with - nice looking menus for Big Button, Split Arrow Button - see Chrome 3.0 omnibar menu (slightly transparent)
 * Do we need a 'catch all' tab for all other perspectives?

@@ -28,6 +28,7 @@ class PerspectiveToTabSynchronizer extends PerspectiveAdapter {
 		this.shell = shell;
 	}
 
+	@Override
 	public void perspectiveActivated(IWorkbenchPage page,
 			IPerspectiveDescriptor perspective) {
 		RibbonTabFolder tabFolder = shell.getRibbonTabFolder();

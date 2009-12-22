@@ -17,6 +17,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import com.hexapixel.widgets.ribbon.QuickAccessShellToolbar;
+import com.hexapixel.widgets.ribbon.RibbonGroupSeparator;
 import com.hexapixel.widgets.ribbon.RibbonTabFolder;
 
 public final class ShellBuilder extends AbstractWindowBuilder {
@@ -51,6 +52,7 @@ public final class ShellBuilder extends AbstractWindowBuilder {
 		RibbonActionFactory.createSave(qat, getWindow());
 		// RibbonActionFactory.createUndo(qat, getWindow());
 		// RibbonActionFactory.createRedo(qat, getWindow());
+		new RibbonGroupSeparator(qat);
 		RibbonActionFactory.createDebugLast(qat, getWindow());
 		RibbonActionFactory.createRunLast(qat, getWindow());
 	}

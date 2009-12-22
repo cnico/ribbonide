@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) Emil Crumhorn - Hexapixel.com - emil.crumhorn@gmail.com
+ * Copyright (c) Emil Crumhorn and others - Hexapixel.com - emil.crumhorn@gmail.com
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    emil.crumhorn@gmail.com - initial API and implementation
+ *    emil.crumhorn@gmail.com  - initial API and implementation
+ *    eclipse-dev@volanakis.de - separator for QuickAccessShellToolbar
  *******************************************************************************/ 
 
 package com.hexapixel.widgets.ribbon;
@@ -345,9 +346,19 @@ public abstract class AbstractShellPainter {
 		DefaultButtonPaintManager dpm = new DefaultButtonPaintManager();
 		
 		// draw toolbar
-		List<RibbonButton> buttons  = mRibbonShell.getToolbar().getButtons();
+		List<AbstractRibbonGroupItem> items = mRibbonShell.getToolbar().getItems();
+		int numButtons = 0;
+		int numSeparators = 0;
+		for (AbstractRibbonGroupItem item : items) {
+			if (item instanceof RibbonButton ) {
+				numButtons++;
+			} else if (item instanceof RibbonGroupSeparator) {
+				numSeparators++;
+			}
+		}
 		
-		int width = buttons.size() * RibbonGroup.TOOLBAR_BUTTON_WIDTH;
+		int width = (numButtons * RibbonGroup.TOOLBAR_BUTTON_WIDTH) 
+		            + (numSeparators * RibbonGroup.SEPARATOR_SPACED_WIDTH);
 		
 		int boundsX = x;
 		int boundsY = y;
@@ -373,16 +384,21 @@ public abstract class AbstractShellPainter {
 		gc.setForeground(mToolbarBottomBorder);
 		gc.drawLine(x, y+4+9+9, x+width, y+4+9+9);
 		
-		for (int i = 0; i < buttons.size(); i++) {
-			RibbonButton button = buttons.get(i);
-						
-			// we create the bounds for the button right here
-			button.setBounds(new Rectangle(x, y+1, RibbonGroup.TOOLBAR_BUTTON_WIDTH, RibbonGroup.TOOLBAR_BUTTON_WIDTH));
-			
-			dpm.drawMenuToolbarButton(gc, button);
-			
-			// we don't care what flags are set on toolbars, groups etc, in this toolbar we draw things only one way, plain and "simple"
-			x += RibbonGroup.TOOLBAR_BUTTON_WIDTH;
+		for (AbstractRibbonGroupItem item : items) {
+			if (item instanceof RibbonButton) {
+				RibbonButton button = (RibbonButton) item;
+				// we create the bounds for the button right here
+				button.setBounds(new Rectangle(x, y+1, RibbonGroup.TOOLBAR_BUTTON_WIDTH, RibbonGroup.TOOLBAR_BUTTON_WIDTH));
+				// we don't care what flags are set on toolbars, groups etc, in this toolbar we draw things only one way, plain and "simple"
+				dpm.drawMenuToolbarButton(gc, button);
+				x += RibbonGroup.TOOLBAR_BUTTON_WIDTH;
+			} else if (item instanceof RibbonGroupSeparator) {
+				RibbonGroupSeparator separator = (RibbonGroupSeparator) item;
+				// we create the bounds for the separator right here
+				separator.setBounds(new Rectangle(x+3, y+5, RibbonGroup.SEPARATOR_WIDTH, RibbonGroup.TOOLBAR_BUTTON_HEIGHT-8));
+				dpm.drawMenuSeparator(gc, separator);
+				x += RibbonGroup.SEPARATOR_SPACED_WIDTH;
+			}
 		}
 				
 		// draw arrow button

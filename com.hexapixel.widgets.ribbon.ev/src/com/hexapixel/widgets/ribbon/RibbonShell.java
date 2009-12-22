@@ -7,10 +7,11 @@
  *
  * Contributors:
  *    emil.crumhorn@gmail.com     - initial API and implementation
- *    eclipse-dev AT volanakis.de - refactored to avoid multiple calls to init,
+ *    eclipse-dev@volanakis.de - refactored to avoid multiple calls to init,
  *       added constructor for pre-existing shell, made initial layout calc
- *       work for Shell.open(), push button support for QuickAccessToolbar,
- *       auto-redraw on enablement change, fix: maximize on two-screen setup
+ *       work for Shell.open(), push button support for QuickAccessShellToolbar,
+ *       auto-redraw on enablement change, fix: maximize on two-screen setup,
+ *       separator for QuickAccessShellToolbar
  *******************************************************************************/ 
 
 package com.hexapixel.widgets.ribbon;
@@ -141,11 +142,6 @@ public class RibbonShell implements MouseListener, MouseMoveListener, KeyListene
 	public QuickAccessShellToolbar getToolbar() {
 		return mToolbar;
 	}
-	
-	// internal
-	List<RibbonButton> getToolbarButtons() {
-		return mToolbar.getButtons();
-	}	
 	
 	public Image getButtonImage() {
 		return buttonImage;

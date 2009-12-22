@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) Emil Crumhorn and others - Hexapixel.com - emil.crumhorn@gmail.com
+= * Copyright (c) Emil Crumhorn and others - Hexapixel.com - emil.crumhorn@gmail.com
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *    emil.crumhorn@gmail.com  - initial API and implementation
  *    eclipse-dev@volanakis.de - added STYLE_PUSH, tooltips for RibbonToolbar
- *        elements
+ *       elements, separator for QuickAccessShellToolbar
  *******************************************************************************/ 
 
 package com.hexapixel.widgets.ribbon;
@@ -56,6 +56,10 @@ public class RibbonGroup extends Canvas implements MouseMoveListener, MouseListe
 	public static int TOOLBAR_BUTTON_WIDTH = 22;
 	public static int TOOLBAR_BUTTON_WIDTH_BORDERED = 22;
 	public static int CHECKBOX_HEIGHT = 13;
+	
+	public static int SEPARATOR_WIDTH = 2;
+	public static int SEPARATOR_SPACING = 3;
+	public static int SEPARATOR_SPACED_WIDTH = (2 * SEPARATOR_SPACING) + SEPARATOR_WIDTH;
 	
 	private boolean mVisible = true;
 	
@@ -1883,9 +1887,9 @@ public class RibbonGroup extends Canvas implements MouseMoveListener, MouseListe
 					
 			if (item instanceof RibbonGroupSeparator) {
 				// spacer + 2 + spacer
-				item.setBounds(new Rectangle(cur+3, 7, 3+2+3, 55));
+				item.setBounds(new Rectangle(cur+SEPARATOR_SPACING, 7, SEPARATOR_SPACED_WIDTH, 55));
 				
-				cur += 3+2+3;
+				cur += SEPARATOR_SPACED_WIDTH;
 			}
 			else if (item instanceof RibbonButton) {
     			// calculate size
