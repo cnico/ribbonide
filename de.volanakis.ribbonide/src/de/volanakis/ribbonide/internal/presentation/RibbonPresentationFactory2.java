@@ -13,6 +13,8 @@ package de.volanakis.ribbonide.internal.presentation;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.ui.internal.presentations.util.StandardViewSystemMenu;
+import org.eclipse.ui.internal.presentations.util.TabbedStackPresentation;
 import org.eclipse.ui.presentations.IStackPresentationSite;
 import org.eclipse.ui.presentations.StackPresentation;
 import org.eclipse.ui.presentations.WorkbenchPresentationFactory;
@@ -21,16 +23,7 @@ import de.volanakis.ribbonide.internal.Activator;
 import de.volanakis.ribbonide.internal.SharedColors;
 
 /**
- * This presentation tweaks the part stacks to make them more vista like.
- * <ul>
- * <li>blue background for CTabFolders</li>
- * <li>blue background for CTab toolbars when next to the tab</li>
- * <li>gray background for CTab toolbars when below the tab</li>
- * <li>blue background for CTabFolder parent</li>
- * <li>blue background for Sashes</li>
- * </ul>
- * Coloring the toolbars was very tricky. Each stack has one and each CTabFolder
- * has one.
+ * TODO [ev] javadoc
  */
 public class RibbonPresentationFactory2 extends WorkbenchPresentationFactory {
 
@@ -54,7 +47,37 @@ public class RibbonPresentationFactory2 extends WorkbenchPresentationFactory {
 	@Override
 	public StackPresentation createViewPresentation(Composite parent,
 			IStackPresentationSite site) {
-		return new RibbonStackPresentation(parent, site);
+		// see WorkbenchPresentationFactory.java
+
+		parent.setBackground(Activator.getSharedColor(SharedColors.WINDOW_BG));
+
+		// DefaultTabFolder folder = new DefaultTabFolder(parent, SWT.TOP
+		// | SWT.BORDER, site
+		// .supportsState(IStackPresentationSite.STATE_MINIMIZED), site
+		// .supportsState(IStackPresentationSite.STATE_MAXIMIZED));
+
+		PresentationTabFolder folder = new PresentationTabFolder(parent);
+
+		// final IPreferenceStore store = PlatformUI.getPreferenceStore();
+		// final int minimumCharacters = store
+		// .getInt(IWorkbenchPreferenceConstants.VIEW_MINIMUM_CHARACTERS);
+		// if (minimumCharacters >= 0) {
+		// folder.setMinimumCharacters(minimumCharacters);
+		// }
+
+		// folder.setUnselectedCloseVisible(false);
+		// folder.setUnselectedImageVisible(true);
+
+		// PresentablePartFolder partFolder = new PresentablePartFolder(folder);
+
+		TabbedStackPresentation result = new TabbedStackPresentation(site,
+		/* partFolder */folder, new StandardViewSystemMenu(site));
+
+		DefaultThemeListener themeListener = new DefaultThemeListener(folder,
+				result.getTheme());
+		result.getTheme().addListener(themeListener);
+
+		return result;
 	}
 
 	@Override
