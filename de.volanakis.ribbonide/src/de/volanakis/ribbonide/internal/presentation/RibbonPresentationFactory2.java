@@ -10,9 +10,13 @@
  *******************************************************************************/
 package de.volanakis.ribbonide.internal.presentation;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.presentations.util.StandardViewSystemMenu;
 import org.eclipse.ui.internal.presentations.util.TabbedStackPresentation;
 import org.eclipse.ui.presentations.IStackPresentationSite;
@@ -24,6 +28,8 @@ import de.volanakis.ribbonide.internal.SharedColors;
 
 /**
  * TODO [ev] javadoc
+ * 
+ * @see WorkbenchPresentationFactory
  */
 public class RibbonPresentationFactory2 extends WorkbenchPresentationFactory {
 
@@ -41,6 +47,7 @@ public class RibbonPresentationFactory2 extends WorkbenchPresentationFactory {
 	@Override
 	public StackPresentation createStandaloneViewPresentation(Composite parent,
 			IStackPresentationSite site, boolean showTitle) {
+		// TODO [ev] get rid of RibbonStackPresentation
 		return new RibbonStackPresentation(parent, site);
 	}
 
@@ -51,22 +58,9 @@ public class RibbonPresentationFactory2 extends WorkbenchPresentationFactory {
 
 		parent.setBackground(Activator.getSharedColor(SharedColors.WINDOW_BG));
 
-		// DefaultTabFolder folder = new DefaultTabFolder(parent, SWT.TOP
-		// | SWT.BORDER, site
-		// .supportsState(IStackPresentationSite.STATE_MINIMIZED), site
-		// .supportsState(IStackPresentationSite.STATE_MAXIMIZED));
-
-		PresentationTabFolder folder = new PresentationTabFolder(parent);
-
-		// final IPreferenceStore store = PlatformUI.getPreferenceStore();
-		// final int minimumCharacters = store
-		// .getInt(IWorkbenchPreferenceConstants.VIEW_MINIMUM_CHARACTERS);
-		// if (minimumCharacters >= 0) {
-		// folder.setMinimumCharacters(minimumCharacters);
-		// }
-
-		// folder.setUnselectedCloseVisible(false);
-		// folder.setUnselectedImageVisible(true);
+		PresentationTabFolder folder = new PresentationTabFolder(parent,
+				SWT.BORDER, site);
+		folder.setMinimumCharacters(getViewMinimumCharsInTab());
 
 		// PresentablePartFolder partFolder = new PresentablePartFolder(folder);
 
@@ -86,6 +80,16 @@ public class RibbonPresentationFactory2 extends WorkbenchPresentationFactory {
 		sash.setBackground(Activator.getSharedColor(SharedColors.WINDOW_BG));
 		sash.addMouseTrackListener(SASH_HOVER_LISTENER);
 		return sash;
+	}
+
+	// helping methods
+	// ////////////////
+
+	private int getViewMinimumCharsInTab() {
+		IPreferenceStore store = PlatformUI.getPreferenceStore();
+		int minChars = store
+				.getInt(IWorkbenchPreferenceConstants.VIEW_MINIMUM_CHARACTERS);
+		return Math.max(0, minChars);
 	}
 
 }

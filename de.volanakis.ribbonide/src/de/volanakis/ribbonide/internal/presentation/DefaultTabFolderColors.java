@@ -22,6 +22,10 @@ public final class DefaultTabFolderColors {
 	public Color[] background;
 	public boolean vertical;
 
+	public DefaultTabFolderColors() {
+		this(null, null, null, false);
+	}
+
 	public DefaultTabFolderColors(Color fgColor, Color[] bgColors,
 			int[] percentages, boolean vertical) {
 

@@ -13,8 +13,12 @@ package de.volanakis.ribbonide.internal.presentation;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabFolder2Listener;
+import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ViewForm;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -26,6 +30,8 @@ import org.eclipse.ui.internal.presentations.defaultpresentation.DefaultTabItem;
 import org.eclipse.ui.internal.presentations.util.AbstractTabFolder;
 import org.eclipse.ui.internal.presentations.util.AbstractTabItem;
 import org.eclipse.ui.internal.presentations.util.PartInfo;
+import org.eclipse.ui.internal.presentations.util.TabFolderEvent;
+import org.eclipse.ui.presentations.IStackPresentationSite;
 
 import de.volanakis.ribbonide.internal.Activator;
 import de.volanakis.ribbonide.internal.SharedColors;
@@ -39,18 +45,29 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 
 	private final CTabFolder tabFolder;
 	private final ViewForm viewForm;
+	// private final ProxyControl contentProxy;
 
 	private DefaultTabFolderColors[] activeColors;
 	private DefaultTabFolderColors[] inactiveColors;
 	private boolean isActive;
 
-	public PresentationTabFolder(Composite parent) {
-		tabFolder = new CTabFolder(parent, SWT.BORDER);
+	public PresentationTabFolder(Composite parent, int style,
+			IStackPresentationSite site) {
+		tabFolder = new CTabFolder(parent, style);
 		tabFolder.setBackground(Activator
 				.getSharedColor(SharedColors.WINDOW_BG));
 		tabFolder.setUnselectedCloseVisible(false);
+		tabFolder.setMinimizeVisible(allowMin(site));
+		tabFolder.setMaximizeVisible(allowMax(site));
+		ExpandListener listener = new ExpandListener();
+		tabFolder.addCTabFolder2Listener(listener);
+		tabFolder.addSelectionListener(listener);
+		attachListeners(tabFolder, false);
 
 		viewForm = new ViewForm(tabFolder, SWT.NO_BACKGROUND);
+		// contentProxy = new ProxyControl(viewForm);
+		// viewForm.setContent(contentProxy.getControl());
+		attachListeners(viewForm, false);
 
 		DefaultTabFolderColors defaultColors = new DefaultTabFolderColors();
 		activeColors = new DefaultTabFolderColors[] { defaultColors,
@@ -134,8 +151,48 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 		}
 	}
 
-	// update active / inactive colors
-	// ////////////////////////////////
+	// dummy methods from AbstractTabFolder
+	// /////////////////////////////////////
+
+	@Override
+	public void flushToolbarSize() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public int getItemCount() {
+		// not strictly necessary, just an optimization
+		return tabFolder.getItemCount();
+	}
+
+	@Override
+	public Point getPaneMenuLocation() {
+		// TODO Auto-generated method stub
+		return super.getPaneMenuLocation();
+	}
+
+	@Override
+	public Point getPartListLocation() {
+		// TODO Auto-generated method stub
+		return super.getPartListLocation();
+	}
+
+	@Override
+	public Point getSystemMenuLocation() {
+		// TODO Auto-generated method stub
+		return super.getSystemMenuLocation();
+	}
+
+	@Override
+	public boolean isOnBorder(Point toTest) {
+		// TODO Auto-generated method stub
+		return super.isOnBorder(toTest);
+	}
+
+	@Override
+	public void layout(boolean flushCache) {
+		// TODO Auto-generated method stub
+	}
 
 	@Override
 	public void setActive(int activeState) {
@@ -148,6 +205,50 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 		this.isActive = isActive;
 		super.shellActive(isActive);
 		updateColors();
+	}
+
+	@Override
+	public void setState(int state) {
+		tabFolder.setMinimized(state == IStackPresentationSite.STATE_MINIMIZED);
+		tabFolder.setMaximized(state == IStackPresentationSite.STATE_MAXIMIZED);
+		super.setState(state);
+	}
+
+	@Override
+	public void setTabPosition(int tabPosition) {
+		// unused
+	}
+
+	@Override
+	public void setToolbar(Control toolbarControl) {
+		// TODO Auto-generated method stub
+		super.setToolbar(toolbarControl);
+	}
+
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		// contentProxy.setVisible(visible);
+	}
+
+	@Override
+	public void showMinMax(boolean show) {
+		tabFolder.setMaximizeVisible(show);
+		tabFolder.setMinimizeVisible(show);
+		layout(true);
+	}
+
+	// misc
+	// /////
+
+	/**
+	 * Minimum number characters to display in the tab.
+	 * 
+	 * @param count
+	 *            an integer >= 0
+	 */
+	public void setMinimumCharacters(int count) {
+		tabFolder.setMinimumCharacters(count);
 	}
 
 	// IThemeCallback methods
@@ -182,6 +283,14 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 	// helping methods
 	// ////////////////
 
+	private boolean allowMin(IStackPresentationSite site) {
+		return site.supportsState(IStackPresentationSite.STATE_MINIMIZED);
+	}
+
+	private boolean allowMax(IStackPresentationSite site) {
+		return site.supportsState(IStackPresentationSite.STATE_MAXIMIZED);
+	}
+
 	private Point computeMinimumSize() {
 		Rectangle trim = tabFolder.computeTrim(0, 0, 0, 0);
 		// 100 extra space for min, max buttons
@@ -197,6 +306,51 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 		tabFolder.setSelectionForeground(currentColors.foreground);
 		tabFolder.setSelectionBackground(currentColors.background,
 				currentColors.percentages, currentColors.vertical);
+	}
+
+	// helping classes
+	// ////////////////
+
+	private final class ExpandListener implements CTabFolder2Listener,
+			SelectionListener {
+
+		public void minimize(CTabFolderEvent event) {
+			// event.doit = false;
+			fireEvent(TabFolderEvent
+					.stackStateToEventId(IStackPresentationSite.STATE_MINIMIZED));
+		}
+
+		public void maximize(CTabFolderEvent event) {
+			// event.doit = false;
+			fireEvent(TabFolderEvent
+					.stackStateToEventId(IStackPresentationSite.STATE_MAXIMIZED));
+		}
+
+		public void restore(CTabFolderEvent event) {
+			// event.doit = false;
+			fireEvent(TabFolderEvent
+					.stackStateToEventId(IStackPresentationSite.STATE_RESTORED));
+		}
+
+		public void close(CTabFolderEvent event) {
+			// event.doit = false;
+			DefaultTabItem item = (DefaultTabItem) event.item.getData();
+			fireEvent(TabFolderEvent.EVENT_CLOSE, item);
+		}
+
+		public void showList(CTabFolderEvent event) {
+			// event.doit = false;
+			fireEvent(TabFolderEvent.EVENT_SHOW_LIST);
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+			// unused
+		}
+
+		public void widgetSelected(SelectionEvent event) {
+			DefaultTabItem item = (DefaultTabItem) event.item.getData();
+			fireEvent(TabFolderEvent.EVENT_TAB_SELECTED, item);
+		}
 	}
 
 }
