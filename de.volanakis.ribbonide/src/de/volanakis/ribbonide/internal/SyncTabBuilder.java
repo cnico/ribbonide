@@ -27,7 +27,7 @@ public final class SyncTabBuilder extends AbstractTabBuilder {
 
 	@Override
 	protected void fillRibbonTab(RibbonTab tab) {
-		createGroupSync(tab);
+		// createGroupSync(tab);
 	}
 
 	private void createGroupSync(RibbonTab tab) {

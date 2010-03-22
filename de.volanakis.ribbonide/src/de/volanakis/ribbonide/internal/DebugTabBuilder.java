@@ -68,20 +68,33 @@ public final class DebugTabBuilder extends AbstractTabBuilder {
 
 		RibbonToolbarGrouping rtgBP = new RibbonToolbarGrouping(toolbar, 2);
 		RibbonButton rbToggleBP = new RibbonButton(rtgBP, ICE
-				.getImage("brkp_obj.gif"), null, RibbonButton.STYLE_PUSH);
+				.getImage("brkp_obj.gif"), ICE.getImage("brkpd_obj.gif"),
+				RibbonButton.STYLE_PUSH);
 		RibbonButton rbSkipAllBPs = new RibbonButton(rtgBP, ICE
-				.getImage("skip_brkp.gif"), null, RibbonButton.STYLE_TOGGLE);
+				.getImage("skip_brkp.gif"), ICD.getImage("skip_brkp.gif"),
+				RibbonButton.STYLE_TOGGLE);
 		RibbonButton rbRemoveAllBPs = new RibbonButton(rtgBP, ICE
 				.getImage("rem_all_co.gif"), ICD.getImage("rem_all_co.gif"),
 				RibbonButton.STYLE_PUSH);
 		RibbonButton rbAddExceptionBP = new RibbonButton(rtgBP, ICE
-				.getImage("exc_catch.gif"), null, RibbonButton.STYLE_PUSH);
+				.getImage("exc_catch.gif"), ICD.getImage("exc_catch.gif"),
+				RibbonButton.STYLE_PUSH);
 
 		RibbonToolbarGrouping rtgOther = new RibbonToolbarGrouping(toolbar, 2);
 		RibbonButton rbInspect = new RibbonButton(rtgOther, ICE
-				.getImage("insp_sbook.gif"), null, RibbonButton.STYLE_PUSH);
+				.getImage("insp_sbook.gif"), ICD.getImage("insp_sbook.gif"),
+				RibbonButton.STYLE_PUSH);
 		RibbonButton rbExpression = new RibbonButton(rtgOther, ICE
-				.getImage("watch_exp.gif"), null, RibbonButton.STYLE_PUSH);
+				.getImage("watch_exp.gif"), ICD.getImage("watch_exp.gif"),
+				RibbonButton.STYLE_PUSH);
+
+		// TODO [ev] enable once hooked up
+		rbToggleBP.setEnabled(false);
+		rbSkipAllBPs.setEnabled(false);
+		rbRemoveAllBPs.setEnabled(false);
+		rbAddExceptionBP.setEnabled(false);
+		rbInspect.setEnabled(false);
+		rbExpression.setEnabled(false);
 	}
 
 	private void createGroupLaunch(RibbonTab tab) {

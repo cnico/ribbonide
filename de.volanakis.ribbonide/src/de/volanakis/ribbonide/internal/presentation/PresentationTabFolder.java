@@ -45,6 +45,7 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 
 	private final CTabFolder tabFolder;
 	private final ViewForm viewForm;
+	// private final ProxyControl toolbarProxy;
 	// private final ProxyControl contentProxy;
 
 	private DefaultTabFolderColors[] activeColors;
@@ -65,9 +66,12 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 		attachListeners(tabFolder, false);
 
 		viewForm = new ViewForm(tabFolder, SWT.NO_BACKGROUND);
+		attachListeners(viewForm, false);
+
+		// toolbarProxy = new ProxyControl(viewForm);
+		// viewForm.setTopCenter(toolbarProxy.getControl());
 		// contentProxy = new ProxyControl(viewForm);
 		// viewForm.setContent(contentProxy.getControl());
-		attachListeners(viewForm, false);
 
 		DefaultTabFolderColors defaultColors = new DefaultTabFolderColors();
 		activeColors = new DefaultTabFolderColors[] { defaultColors,
@@ -156,7 +160,7 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 
 	@Override
 	public void flushToolbarSize() {
-		// TODO Auto-generated method stub
+		// viewForm.changed(new Control[] { toolbarProxy.getControl() });
 	}
 
 	@Override
@@ -191,7 +195,8 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 
 	@Override
 	public void layout(boolean flushCache) {
-		// TODO Auto-generated method stub
+		Rectangle clientArea = tabFolder.getClientArea();
+		viewForm.setBounds(clientArea);
 	}
 
 	@Override
@@ -221,7 +226,11 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 
 	@Override
 	public void setToolbar(Control toolbarControl) {
-		// TODO Auto-generated method stub
+		if (toolbarControl != null) {
+			toolbarControl.setVisible(false);
+		}
+		// toolbarProxy.setTargetControl(toolbarControl);
+		// viewForm.changed(new Control[] { toolbarProxy.getControl() });
 		super.setToolbar(toolbarControl);
 	}
 
@@ -349,6 +358,7 @@ public class PresentationTabFolder extends AbstractTabFolder implements
 
 		public void widgetSelected(SelectionEvent event) {
 			DefaultTabItem item = (DefaultTabItem) event.item.getData();
+			Assert.isNotNull(item);
 			fireEvent(TabFolderEvent.EVENT_TAB_SELECTED, item);
 		}
 	}
